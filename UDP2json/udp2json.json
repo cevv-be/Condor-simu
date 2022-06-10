@@ -1,0 +1,24 @@
+{   
+    "http" : {
+        "port": 8080,
+        "metricpath": "/metrics/condor.json",
+        "dashpath": "/dash/",
+        "dashdir":"../Dashboard/"
+        },
+    "udp" : {
+		"udpport":55278,
+		"udpRelayAddr" :""
+	},
+    "metricsunits":{
+		"time":"h",
+		"airspeed":"m/s",
+		"altitude":"m",
+		"vario":"m/s",
+		"evario":"m/s",
+		"nettovario":"m/s",
+		"integrator":"m/s",
+		"compass":"deg",
+		"slipball":"rad"
+	}
+}
+
