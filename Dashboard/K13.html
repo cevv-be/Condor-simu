@@ -1,0 +1,259 @@
+<html>
+  <body>
+    <script src="d3.v7.min.js"></script>
+    <script src="g3.min.js"></script>
+    <script>
+var ab1=60;
+var ab2=200;
+var av1=60;
+var av2=150;
+var aj1=150;
+var aj2=200;
+var vne=200;
+var voa=90;
+//anémomètre
+var vitesse=g3.gauge()
+        .metric('airspeed').unit('km/h')
+        .measure(d3.scaleLinear().domain([30,250]).range([-165, 150]))
+        .append(
+            g3.gaugeFace(),
+            g3.gaugeScrew().shape('phillips').x(-90).y(-90),
+            g3.gaugeScrew().shape('phillips').x(-90).y(90),
+            g3.gaugeScrew().shape('phillips').x(90).y(90),
+            g3.gaugeScrew().shape('phillips').x(90).y(-90),
+            g3.axisTicks().step(10).size(7).style('stroke-width: 3'),
+            g3.axisTicks().step(50).size(15).style('stroke-width: 10'),
+            g3.axisSector([ab1, ab2]).inset(12).size(5),  // arc blanc
+            g3.axisSector([av1, av2]).inset(5).size(7).class('g3-normal-fill'),//arc vert
+            g3.axisSector([aj1, aj2]).inset(5).size(7).style('fill: yellow; stroke: yellow'),  // arc jaune
+            g3.axisTicks([vne]).size(17).style('stroke-width: 7').class('g3-danger-stroke'),//trait rouge
+            g3.axisTicks([voa]).shape('wedge').size(15).width(20).style('fill: yellow; stroke: yellow').inset(-10),//trait jaune
+            g3.axisLabels().step(50).inset(30),
+            g3.axisLabels([30]).size(10).inset(25),
+            g3.gaugeLabel("WINTER").size(12).x(-40).y(-45),
+            g3.gaugeLabel("R-10-210.8").size(12).x(40).y(-45),
+            g3.gaugeLabel("Km/h").size(12).y(33),
+            g3.gaugeLabel("W78258").x(-50).y(0),
+            g3.indicatePointer().shape('blade').clamp([20,250])
+        );
+//altimètre
+var altitude=g3.gauge()
+        .metric('altitude').unit('m')
+        .measure(d3.scaleLinear().domain([0, 1000]).range([-180, 180]))
+        .defs(
+            g3.element('pattern', {
+                id: 'altitudeDangerPattern',
+                width: 10, height: 10,
+                patternTransform: 'rotate(45)',
+                patternUnits: 'userSpaceOnUse'
+            }).append(g3.element('rect', {width: 10, height: 5}).class('g3-fg-fill')),
+        )
+        .append(
+            // self-indicating gauge for pressure, to view through window, IF there would be such a metric available
+            g3.put().rotate(90).append(
+                g3.gauge()
+                    //.metric('pressureSetting').unit('hPa')
+                    .fake(g3.forceSeries(1013,1014))
+                    .measure(d3.scaleLinear().domain([1013,1014]).range([0, 10]))
+                    .autoindicate(false)
+                    .append(
+                        g3.gaugeFace().style('fill: #111'),
+                        g3.axisTicks().step(5).size(5).inset(10),
+                        g3.axisTicks().step(1).size(3).inset(10),
+                        g3.axisTicks([1013.25]).size(5).inset(10).class('g3-danger-stroke'),
+                        g3.axisLabels(d3.range(1013, 1014, 5)).size(10).orient('relative').rotate(-90),
+                    )
+            ),
+            // add a face with two see-through windows
+            g3.gaugeFace().window((_, g) => {
+                g3.axisSector([725, 775]).inset(11).size(24).style('fill: black')(_, g); // pressure window
+            }).style('filter: url(#dropShadow3)'),  //TODO doesn't drop shadow windows properly?
+            g3.axisTicks([750]).shape('wedge').size(10).width(3),
+            g3.axisTicks().step(20),
+            g3.axisTicks().step(100).size(15).style('stroke-width: 2'),
+            g3.axisLabels().step(100).format(v => v/100).size(35),
+            // g3.gaugeLabel("ALTITUDE").y(-10).size(15),
+            g3.gaugeLabel("mB").x(60).y(0).size(6),
+            g3.gaugeLabel("hm-km").x(-40).y(25).size(10),
+            g3.indicatePointer().shape('blade').rescale(v => v/10),
+            g3.indicatePointer().shape('sword'),
+            g3.gaugeScrew().shape('phillips').x(-90).y(-90),
+            g3.gaugeScrew().shape('phillips').x(-90).y(90),
+            g3.gaugeScrew().shape('phillips').x(90).y(90),
+            g3.gaugeScrew().shape('phillips').x(90).y(-90),
+        );
+//variomètre
+var Vv=g3.gauge()
+.metric('vario').unit('m/s')
+        .measure(d3.scaleLinear().domain([-5, 5]).range([90, 90+360]))
+        .append(
+            g3.gaugeFace(),
+            g3.gaugeScrew().shape('phillips').x(-90).y(-90),
+            g3.gaugeScrew().shape('phillips').x(-90).y(90),
+            g3.gaugeScrew().shape('phillips').x(90).y(90),
+            g3.gaugeScrew().shape('phillips').x(90).y(-90),
+            g3.axisTicks().step(0.5).size(5),
+            g3.axisTicks().step(1).size(15).style('stroke-width: 5'),
+            g3.axisLabels().step(1).format(v => Math.abs(v)),
+            
+            g3.gaugeLabel("39543").x(50).y(-25).size(12),
+            g3.gaugeLabel("m/s").x(50).y(-10).size(10),
+            // add up/down arrows as sector lines plus custom tick marks
+            g3.axisSector([-1,1]).size(0).inset(45).class('g3-fg-stroke').style('stroke-width: 4'),
+            // TODO this should be a custom tick mark shape, with access to current tick val?
+            (_, g) => {
+                _.selectAll(null).data([-1, 1])
+                .enter().append('path')
+                    .attr('d', "M 2,0 l -7,4 l 0,-8 Z")
+                    .attr('transform', d => g.marktransform(d, 45) + (d < 0 ? ' rotate(180)':''))
+                    .attr('class', 'g3-fg-fill')
+            },
+            //g3.gaugeLabel("+").x(-57).y(-37).size(15).style('text-anchor: start'),
+            //g3.gaugeLabel("-").x(-57).y(37).size(15).style('text-anchor: start'),
+            g3.indicatePointer().shape('sword').clamp([-5, 5]),
+        );
+//variomètre électrique
+var Vvélec=g3.gauge()
+        .metric('evario').unit('m/s')
+        .measure(d3.scaleLinear().domain([-10, 10]).range([90, 90+360]))
+        .append(
+            g3.gaugeFace(),
+            g3.gaugeScrew().shape('phillips').x(-90).y(-90),
+            g3.gaugeScrew().shape('phillips').x(-90).y(90),
+            g3.gaugeScrew().shape('phillips').x(90).y(90),
+            g3.gaugeScrew().shape('phillips').x(90).y(-90),
+            g3.axisTicks().step(1).size(15).style('stroke-width: 2'),
+            g3.axisLabels().step(2).format(v => Math.abs(v)),
+            g3.gaugeLabel("Electro").y(15).size(15),
+            g3.gaugeLabel("m/s").y(25).size(15),
+            g3.gaugeLabel("+").x(-47).y(-37).size(15).style('text-anchor: start'),
+            g3.gaugeLabel("-").x(-47).y(37).size(15).style('text-anchor: start'),
+            g3.indicatePointer().shape('sword').clamp([-10, 10]),
+        );
+//horloge
+// extract the minutes from hour in decimal format
+function HdecMin(t){
+    var minutes = Math.trunc(60  * (t - Math.trunc(t)))
+    var s = "00" + minutes;
+    return s.substr(s.length-2);
+}
+function HdecSec(t){
+    var remain = t - Math.trunc(t);
+    var minutes = 60  * (t - Math.trunc(t))
+    var sec = Math.trunc( 60 * (minutes -Math.trunc(minutes)))
+
+    var s = "00" + sec;
+    if(sec % 2 == 0) {
+        return ' '+ s.substr(s.length-2);
+    } else {
+        return ':'+ s.substr(s.length-2);
+    }
+
+}
+var horloge=g3.gauge()
+        .metric('time').unit('h')
+        .css('text.g3-indicate-text { fill: #20282C }')
+        .append(
+            g3.element('rect', {width: 160, height: 50, x: -50, y: -25}).attr('rx', 10).style('fill: #A8A8A4'),
+            g3.put().x(-22).append(
+                g3.indicateText().format(t => Math.trunc(t)+":").size(36).style('font-family: DSEG7-Classic')
+            ),
+            g3.put().x(43).append(
+                g3.indicateText()
+                    .format(t => HdecMin(t) )
+                    .size(36).style('font-family: DSEG7-Classic')
+            ),
+            g3.put().x(90).append(
+                g3.indicateText()
+                .format(t => HdecSec(t))
+                .size(20).style('font-family: DSEG7-Classic')
+            )
+        );
+        
+//bille
+var bille=g3.gauge()
+        .metric('slipball').unit('deg')
+        .fake(g3.forceSeries(-10, 10))
+        .measure(d3.scaleLinear().domain([-3, 3]).range([-20, 20]))
+        .append(
+            // gaguge for slip, degrees of ball deflection
+            g3.gauge()
+                .metric('slipball').unit('deg')
+                .measure(d3.scaleLinear().domain([5,-5]).range([170,190]))
+                .r(300)
+                .append(
+                    g3.gaugeFace(),
+                    g3.gaugeLabel('WINTER').size(12).y(0),
+                    g3.gaugeScrew().shape('phillips').x(-90).y(-90).r(12,5),
+                    g3.gaugeScrew().shape('phillips').x(-90).y(90).r(12,5),
+                    g3.gaugeScrew().shape('phillips').x(90).y(90).r(12,5),
+                    g3.gaugeScrew().shape('phillips').x(90).y(-90).r(12,5),
+                    g3.put().y(-255).append(
+                        // background for the tube
+                        g3.axisSector([-8,8]).inset(-9).size(18).style('fill: #c0c0a8; filter: url(#dropShadow3)'),
+                        // add ball as pointer
+                        g3.indicatePointer().clamp([-5,5]).append(
+                            g3.put().scale(0.8,1).y(-300).rotate(-180).append(
+                                // add ball background plus a highlight, with the rotate(-180) to avoid having
+                                // the highlight flipped since the ball is tyipcally indicating near 180 rotation
+                                g3.element('circle', {r: 8}).style('fill: #333'),
+                                g3.element('circle', {r: 8}).class('g3-highlight'),
+                            )
+                        ),
+                        g3.axisTicks([-1,1]).inset(-9).size(18).style('stroke-width: 2; stroke: #666'),
+                        // add a blurred highlight to the tube
+                        g3.axisSector([-8,8]).inset(0).size(6)
+                            .style('fill: white; filter: url(#gaussianBlur1); fill-opacity: 0.33')
+                    )
+                ),
+            g3.axisSector([0,360]).size(24).class('g3-bg-fill').style('filter: url(#dropShadow2)'),
+            
+        );
+
+
+var compas = g3.gauge()
+        .append(
+            g3.gaugeScrew().shape('phillips').x(-90).y(-90).r(12,5),
+            g3.gaugeScrew().shape('phillips').x(-90).y(90).r(12,5),
+            g3.gaugeScrew().shape('phillips').x(90).y(90).r(12,5),
+            g3.gaugeScrew().shape('phillips').x(90).y(-90).r(12,5),
+            g3.gauge()
+            .clip(g3.gaugeFace())
+            .append(
+                g3.gaugeFace(),
+                g3.axisTicks([0]).size(200),   
+                g3.put().y(90).append(              
+                    g3.gauge()
+                    .r('100')
+                    .metric('compass').unit('deg')
+                    .measure(d3.scaleLinear().domain([0,360]).range([0,360]))
+                    .autoindicate(true)
+                    .append(
+                        g3.axisTicks().step(5).size(5),
+                        g3.axisTicks().step(10).size(10),
+                        g3.axisTicks().step(30).size(10).style('stroke-width: 2'),
+                        g3.axisLabels().step(30).orient('relative'),
+                    ),
+                ),
+                g3.axisSector().size(50).class('g3-bg-fill'),
+            )
+        );
+    
+//création du panneau
+var p = g3.panel()
+    .width(1920)
+    .height(1200)
+    .append(    
+        g3.put().x(275).y(255).scale(2.55).append(vitesse),
+        g3.put().x(960).y(1200-360).scale(1.6).append(bille),
+        g3.put().x(960).y(255).scale(2.55).append(Vv),
+        g3.put().x(1920-275).y(255).scale(2.55).append(Vvélec),
+        g3.put().x(275).y(1200-360).scale(1.6).append(compas),
+        g3.put().x(930).y(1200-100).append(horloge),
+        g3.put().x(1920-275).y(1200-265).scale(2.55).append(altitude),
+    )
+    .interval(51).url("http://localhost:8080/metrics/condor.json");
+    p('body');
+    </script>
+  </body>
+</html>
