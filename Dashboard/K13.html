@@ -236,7 +236,47 @@ var compass = g3.gauge()
                         g3.axisLabels().step(30).orient('relative'),
                     ),
                 ),
-                g3.axisSector().size(50).class('g3-bg-fill'),
+                g3.axisSector().size(30).class('g3-bg-fill'),
+            )
+        );
+var maxG=1;
+var minG=1;        
+function maxg(g){
+    if(g > maxG){
+        maxG=g;
+    }
+    return maxG;
+}
+function ming(g){
+    if(g <  minG){
+        minG=g;
+    }
+    return minG;
+}
+function resetG(){
+    maxG=1;
+    minG=1;
+}
+
+var Gmeter = g3.gauge()
+        .metric('gforce').unit('g')
+        .measure(d3.scaleLinear().domain([-6,8]).range([-220,80]))
+        .append(
+            g3.gaugeScrew().shape('phillips').x(-90).y(-90).r(12,5),
+            g3.gaugeScrew().shape('phillips').x(90).y(90).r(12,5),
+            g3.gaugeScrew().shape('phillips').x(90).y(-90).r(12,5),
+            g3.gaugeFace(),
+            g3.axisTicks().step(1).size(15).style('stroke-width: 2'),
+            g3.axisTicks().step(.2).size(5).style('stroke-width: 1'),
+            g3.axisLabels().step(1).format(v => Math.abs(v)),
+            g3.gaugeLabel("G").y(15).size(15),
+            g3.indicatePointer().shape('omega-baton-short').rescale(g =>maxg(g)).clamp([0,10]),
+            g3.indicatePointer().shape('omega-baton-short').rescale(g =>ming(g)).clamp([-10,1]),
+            g3.indicatePointer().shape('sword').clamp([-10, 10]),
+            g3.put().x(-85).y(85).append(
+                g3.gaugeLabel("R").size(15).style('stroke: #e6e1dc'),
+                // here the big trick to attach a javascript function to a SVG element
+                g3.element('circle', {r: 15, onclick: "resetG()"}).style('fill: url(#highlightGradient); opacity: 0.5')
             )
         );
     
@@ -249,12 +289,12 @@ var p = g3.panel()
         g3.put().x(960).y(1200-360).scale(1.6).append(slipball),
         g3.put().x(960).y(255).scale(2.55).append(Vv),
         g3.put().x(1920-275).y(255).scale(2.55).append(Vel),
-        g3.put().x(275).y(1200-360).scale(1.6).append(compass),
-        g3.put().x(930).y(1200-100).append(clock),
-        g3.put().x(1920-275).y(1200-265).scale(2.55).append(altimeter),
-    )
-    .interval(51).url("http://localhost:8080/metrics/condor.json");
-    p('body');
+        g3.put().x(600).y(1200-360).scale(1.6).append(Gmeter),
+        g3.put().x(255).y(1200-360).scale(1.6).append(compass),
+        g3.put().x(950).y(1200-100).append(clock),
+        g3.put().x(1920-275).y(1200-300).scale(2.55).append(altimeter),
+    ).interval(51).url("http://localhost:8080/metrics/condor.json");
+    panel('body');
     </script>
   </body>
 </html>
