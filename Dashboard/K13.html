@@ -38,6 +38,28 @@ var airspeed=g3.gauge()
             g3.indicatePointer().shape('blade').clamp([20,maxspeed])
         );
 //altimeter
+var qfe=0.0;
+var setQfe= false;
+// return QNH if qfe is 0, deduct qfe value if qfe is set.
+function Qnh2FE(h){
+    // record altitude as qfe when switch is set to QFE.
+    if(setQfe){
+        qfe=h;
+        setQfe=false;
+    }
+    return h - qfe;
+}
+// on click function for button
+function checkQFE(evt){
+    var label = document.getElementsByClassName('qnh-label')[0]
+    if(qfe>0){
+        qfe=0;
+        label.innerHTML="QNH"
+    } else {
+        setQfe=true;
+        label.innerHTML="QFE"
+    }
+}
 var altimeter=g3.gauge()
         .metric('altitude').unit('m')
         .measure(d3.scaleLinear().domain([0, 1000]).range([-180, 180]))
@@ -76,12 +98,16 @@ var altimeter=g3.gauge()
             // g3.gaugeLabel("ALTITUDE").y(-10).size(15),
             g3.gaugeLabel("mB").x(60).y(0).size(6),
             g3.gaugeLabel("hm-km").x(-40).y(25).size(10),
-            g3.indicatePointer().shape('blade').rescale(v => v/10),
-            g3.indicatePointer().shape('sword'),
+            g3.indicatePointer().shape('blade').rescale(h => Qnh2FE(h)/10),
+            g3.indicatePointer().shape('sword').rescale(h=> Qnh2FE(h)),
             g3.gaugeScrew().shape('phillips').x(-90).y(-90),
-            g3.gaugeScrew().shape('phillips').x(-90).y(90),
             g3.gaugeScrew().shape('phillips').x(90).y(90),
             g3.gaugeScrew().shape('phillips').x(90).y(-90),
+            g3.put().x(-85).y(85).append(
+                g3.gaugeLabel("QNH").size(15).style('stroke: #e6e1dc').class('qnh-label'),
+                // here the big trick to attach a javascript function to a SVG element
+                g3.element('circle', {r: 15, onclick: "checkQFE(evt)"}).style('fill: url(#highlightGradient); opacity: 0.5')
+            )
         );
 //Mechanical Vario
 var Vv=g3.gauge()
