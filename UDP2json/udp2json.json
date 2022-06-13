@@ -18,7 +18,8 @@
 		"nettovario":"m/s",
 		"integrator":"m/s",
 		"compass":"deg",
-		"slipball":"rad"
+		"slipball":"rad",
+		"gforce": "g"
 	}
 }
 
