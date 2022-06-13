@@ -11,10 +11,11 @@ var aj1=150;
 var aj2=200;
 var vne=200;
 var voa=90;
-//anémomètre
-var vitesse=g3.gauge()
+var maxspeed=250;
+//Airspeed
+var airspeed=g3.gauge()
         .metric('airspeed').unit('km/h')
-        .measure(d3.scaleLinear().domain([30,250]).range([-165, 150]))
+        .measure(d3.scaleLinear().domain([30,maxspeed]).range([-165, 150]))
         .append(
             g3.gaugeFace(),
             g3.gaugeScrew().shape('phillips').x(-90).y(-90),
@@ -23,21 +24,21 @@ var vitesse=g3.gauge()
             g3.gaugeScrew().shape('phillips').x(90).y(-90),
             g3.axisTicks().step(10).size(7).style('stroke-width: 3'),
             g3.axisTicks().step(50).size(15).style('stroke-width: 10'),
-            g3.axisSector([ab1, ab2]).inset(12).size(5),  // arc blanc
-            g3.axisSector([av1, av2]).inset(5).size(7).class('g3-normal-fill'),//arc vert
-            g3.axisSector([aj1, aj2]).inset(5).size(7).style('fill: yellow; stroke: yellow'),  // arc jaune
-            g3.axisTicks([vne]).size(17).style('stroke-width: 7').class('g3-danger-stroke'),//trait rouge
-            g3.axisTicks([voa]).shape('wedge').size(15).width(20).style('fill: yellow; stroke: yellow').inset(-10),//trait jaune
+            g3.axisSector([ab1, ab2]).inset(12).size(5),  // white arc
+            g3.axisSector([av1, av2]).inset(5).size(7).class('g3-normal-fill'),// green arc
+            g3.axisSector([aj1, aj2]).inset(5).size(7).style('fill: yellow; stroke: yellow'),  // yellow arc
+            g3.axisTicks([vne]).size(17).style('stroke-width: 7').class('g3-danger-stroke'),//red mark vne
+            g3.axisTicks([voa]).shape('wedge').size(12).width(15).style('fill: yellow; stroke: yellow').inset(-10),//trait jaune
             g3.axisLabels().step(50).inset(30),
             g3.axisLabels([30]).size(10).inset(25),
             g3.gaugeLabel("WINTER").size(12).x(-40).y(-45),
             g3.gaugeLabel("R-10-210.8").size(12).x(40).y(-45),
             g3.gaugeLabel("Km/h").size(12).y(33),
             g3.gaugeLabel("W78258").x(-50).y(0),
-            g3.indicatePointer().shape('blade').clamp([20,250])
+            g3.indicatePointer().shape('blade').clamp([20,maxspeed])
         );
-//altimètre
-var altitude=g3.gauge()
+//altimeter
+var altimeter=g3.gauge()
         .metric('altitude').unit('m')
         .measure(d3.scaleLinear().domain([0, 1000]).range([-180, 180]))
         .defs(
@@ -82,7 +83,7 @@ var altitude=g3.gauge()
             g3.gaugeScrew().shape('phillips').x(90).y(90),
             g3.gaugeScrew().shape('phillips').x(90).y(-90),
         );
-//variomètre
+//Mechanical Vario
 var Vv=g3.gauge()
 .metric('vario').unit('m/s')
         .measure(d3.scaleLinear().domain([-5, 5]).range([90, 90+360]))
@@ -112,8 +113,8 @@ var Vv=g3.gauge()
             //g3.gaugeLabel("-").x(-57).y(37).size(15).style('text-anchor: start'),
             g3.indicatePointer().shape('sword').clamp([-5, 5]),
         );
-//variomètre électrique
-var Vvélec=g3.gauge()
+// Electronic Vario
+var Vel=g3.gauge()
         .metric('evario').unit('m/s')
         .measure(d3.scaleLinear().domain([-10, 10]).range([90, 90+360]))
         .append(
@@ -150,7 +151,7 @@ function HdecSec(t){
     }
 
 }
-var horloge=g3.gauge()
+var clock=g3.gauge()
         .metric('time').unit('h')
         .css('text.g3-indicate-text { fill: #20282C }')
         .append(
@@ -170,8 +171,8 @@ var horloge=g3.gauge()
             )
         );
         
-//bille
-var bille=g3.gauge()
+//slipball
+var slipball=g3.gauge()
         .metric('slipball').unit('deg')
         .fake(g3.forceSeries(-10, 10))
         .measure(d3.scaleLinear().domain([-3, 3]).range([-20, 20]))
@@ -211,7 +212,7 @@ var bille=g3.gauge()
         );
 
 
-var compas = g3.gauge()
+var compass = g3.gauge()
         .append(
             g3.gaugeScrew().shape('phillips').x(-90).y(-90).r(12,5),
             g3.gaugeScrew().shape('phillips').x(-90).y(90).r(12,5),
@@ -244,13 +245,13 @@ var p = g3.panel()
     .width(1920)
     .height(1200)
     .append(    
-        g3.put().x(275).y(255).scale(2.55).append(vitesse),
-        g3.put().x(960).y(1200-360).scale(1.6).append(bille),
+        g3.put().x(275).y(255).scale(2.55).append(airspeed),
+        g3.put().x(960).y(1200-360).scale(1.6).append(slipball),
         g3.put().x(960).y(255).scale(2.55).append(Vv),
-        g3.put().x(1920-275).y(255).scale(2.55).append(Vvélec),
-        g3.put().x(275).y(1200-360).scale(1.6).append(compas),
-        g3.put().x(930).y(1200-100).append(horloge),
-        g3.put().x(1920-275).y(1200-265).scale(2.55).append(altitude),
+        g3.put().x(1920-275).y(255).scale(2.55).append(Vel),
+        g3.put().x(275).y(1200-360).scale(1.6).append(compass),
+        g3.put().x(930).y(1200-100).append(clock),
+        g3.put().x(1920-275).y(1200-265).scale(2.55).append(altimeter),
     )
     .interval(51).url("http://localhost:8080/metrics/condor.json");
     p('body');
