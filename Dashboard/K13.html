@@ -1,12 +1,129 @@
 <html>
   <body>
     <script src="d3.v7.min.js"></script>
-    <script src="g3.min.js"></script>
+    <script src="g3.js"></script>
     <script>
+const gliders_params = {
+    "K13" : {
+        "ab1":60,
+        "ab2":200,
+        "av1":60,
+        "aj1":150,
+        "aj2":200,
+        "vne":200,
+        "voa":90,
+        "maxspeed":250
+    },
+    "K8" : {
+        "ab1":60,
+        "ab2":200,
+        "av1":60,
+        "aj1":150,
+        "aj2":200,
+        "vne":200,
+        "voa":90,
+        "maxspeed":250
+    },
+    "K21": {
+        "ab1":60,
+        "ab2":200,
+        "av1":60,
+        "aj1":150,
+        "aj2":250,
+        "vne":250,
+        "voa":95,
+        "maxspeed":270
+    },
+    "DuoDiscus": {
+        "ab1":60,
+        "ab2":200,
+        "av1":60,
+        "aj1":150,
+        "aj2":200,
+        "vne":200,
+        "voa":90,
+        "maxspeed":250
+    },
+     "Antares": {
+        "ab1":60,
+        "ab2":200,
+        "av1":60,
+        "aj1":150,
+        "aj2":200,
+        "vne":200,
+        "voa":90,
+        "maxspeed":250
+    },
+     "Blanik": {
+        "ab1":60,
+        "ab2":200,
+        "av1":60,
+        "aj1":150,
+        "aj2":200,
+        "vne":200,
+        "voa":90,
+        "maxspeed":250
+    },
+     "Pegase": {
+        "ab1":60,
+        "ab2":200,
+        "av1":60,
+        "aj1":150,
+        "aj2":200,
+        "vne":200,
+        "voa":90,
+        "maxspeed":250
+    },
+     "StdCirrus": {
+        "ab1":60,
+        "ab2":200,
+        "av1":60,
+        "aj1":150,
+        "aj2":200,
+        "vne":200,
+        "voa":90,
+        "maxspeed":250
+    },
+     "Diana2": {
+        "ab1":60,
+        "ab2":200,
+        "av1":60,
+        "aj1":150,
+        "aj2":200,
+        "vne":200,
+        "voa":90,
+        "maxspeed":250
+    },
+     "DG808_15m": {
+        "ab1":60,
+        "ab2":200,
+        "av1":60,
+        "aj1":150,
+        "aj2":200,
+        "vne":200,
+        "voa":90,
+        "maxspeed":250
+    },
+     "DG808_18m": {
+        "ab1":60,
+        "ab2":200,
+        "av1":60,
+        "aj1":150,
+        "aj2":200,
+        "vne":200,
+        "voa":90,
+        "maxspeed":250
+    }
+}
+
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const glider = urlParams.get('Glider')
+
+
 var ab1=60;
 var ab2=200;
 var av1=60;
-var av2=150;
 var aj1=150;
 var aj2=200;
 var vne=200;
@@ -25,7 +142,7 @@ var airspeed=g3.gauge()
             g3.axisTicks().step(10).size(7).style('stroke-width: 3'),
             g3.axisTicks().step(50).size(15).style('stroke-width: 10'),
             g3.axisSector([ab1, ab2]).inset(12).size(5),  // white arc
-            g3.axisSector([av1, av2]).inset(5).size(7).class('g3-normal-fill'),// green arc
+            g3.axisSector([av1, aj1]).inset(5).size(7).class('g3-normal-fill'),// green arc
             g3.axisSector([aj1, aj2]).inset(5).size(7).style('fill: yellow; stroke: yellow'),  // yellow arc
             g3.axisTicks([vne]).size(17).style('stroke-width: 7').class('g3-danger-stroke'),//red mark vne
             g3.axisTicks([voa]).shape('wedge').size(12).width(15).style('fill: yellow; stroke: yellow').inset(-10),//trait jaune
@@ -35,7 +152,7 @@ var airspeed=g3.gauge()
             g3.gaugeLabel("R-10-210.8").size(12).x(40).y(-45),
             g3.gaugeLabel("Km/h").size(12).y(33),
             g3.gaugeLabel("W78258").x(-50).y(0),
-            g3.indicatePointer().shape('blade').clamp([20,maxspeed])
+            g3.indicatePointer().shape('sword').clamp([20,maxspeed])
         );
 //altimeter
 var qfe=0.0;
@@ -214,10 +331,11 @@ var slipball=g3.gauge()
         .fake(g3.forceSeries(-10, 10))
         .measure(d3.scaleLinear().domain([-3, 3]).range([-20, 20]))
         .append(
-            // gaguge for slip, degrees of ball deflection
+            g3.gaugeFace().window(g3.element('rect', {width: 160, height: 50, x: 0, y: -25}).attr('rx', 10)),
+            // gauge for slip, degrees of ball deflection
             g3.gauge()
                 .metric('slipball').unit('deg')
-                .measure(d3.scaleLinear().domain([5,-5]).range([170,190]))
+                .measure(d3.scaleLinear().domain([4,-4]).range([170,190]))
                 .r(300)
                 .append(
                     g3.gaugeFace(),
@@ -228,9 +346,9 @@ var slipball=g3.gauge()
                     g3.gaugeScrew().shape('phillips').x(90).y(-90).r(12,5),
                     g3.put().y(-255).append(
                         // background for the tube
-                        g3.axisSector([-8,8]).inset(-9).size(18).style('fill: #c0c0a8; filter: url(#dropShadow3)'),
+                        g3.axisSector([-6,6]).inset(-9).size(18).style('fill: #c0c0a8; filter: url(#dropShadow3)'),
                         // add ball as pointer
-                        g3.indicatePointer().clamp([-5,5]).append(
+                        g3.indicatePointer().clamp([-4,4]).append(
                             g3.put().scale(0.8,1).y(-300).rotate(-180).append(
                                 // add ball background plus a highlight, with the rotate(-180) to avoid having
                                 // the highlight flipped since the ball is tyipcally indicating near 180 rotation
@@ -240,7 +358,7 @@ var slipball=g3.gauge()
                         ),
                         g3.axisTicks([-1,1]).inset(-9).size(18).style('stroke-width: 2; stroke: #666'),
                         // add a blurred highlight to the tube
-                        g3.axisSector([-8,8]).inset(0).size(6)
+                        g3.axisSector([-6,6]).inset(0).size(6)
                             .style('fill: white; filter: url(#gaussianBlur1); fill-opacity: 0.33')
                     )
                 ),
@@ -260,9 +378,9 @@ var compass = g3.gauge()
             .append(
                 g3.gaugeFace(),
                 g3.axisTicks([0]).size(200),   
-                g3.put().y(90).append(              
+                g3.put().y(100).append(              
                     g3.gauge()
-                    .r('100')
+                    .r('130')
                     .metric('compass').unit('deg')
                     .measure(d3.scaleLinear().domain([0,360]).range([0,360]))
                     .autoindicate(true)
@@ -316,11 +434,12 @@ var Gmeter = g3.gauge()
                 g3.element('circle', {r: 15, onclick: "resetG()"}).style('fill: url(#highlightGradient); opacity: 0.5')
             )
         );
-    
+
 //création du panneau
-var p = g3.panel()
+var panel = g3.panel()
     .width(1920)
     .height(1200)
+    //.grid(true)
     .append(    
         g3.put().x(275).y(255).scale(2.55).append(airspeed),
         g3.put().x(960).y(1200-360).scale(1.6).append(slipball),
@@ -330,8 +449,33 @@ var p = g3.panel()
         g3.put().x(255).y(1200-360).scale(1.6).append(compass),
         g3.put().x(950).y(1200-100).append(clock),
         g3.put().x(1920-275).y(1200-300).scale(2.55).append(altimeter),
-    ).interval(51).url("http://localhost:8080/metrics/condor.json");
+    ).interval(1000).url("http://localhost:8080/metrics/condor.json");
     panel('body');
+
+    // Create a form dynamically
+    var form = document.createElement("form");
+    form.setAttribute("method", "get");
+    form.setAttribute("action", "#");
+
+    var selectList = document.createElement("select");
+    selectList.id="Glider";
+    selectList.name="Glider";
+    selectList.setAttribute("onchange","this.form.submit()");
+
+    Object.keys(gliders_params).forEach(key => {
+        var option = document.createElement("option");
+        option.value = key;
+        option.text = key;
+        if(key == glider){
+            option.selected=true;
+        }
+        selectList.appendChild(option);
+    })
+    form.appendChild(selectList);
+
+    document.getElementsByTagName("body")[0]
+                            .appendChild(form);
     </script>
   </body>
+
 </html>
