@@ -118,14 +118,16 @@ func receiveUDP() {
 					number, _ := strconv.ParseFloat(string(fields[1]), 64)
 					output.Metrics[mymetric] = number
 				}
-
+				output.Latest = time.Now().Unix()
 			}
+
 		}
 	}
 }
 
 // Serve the json response
 func serveJson(w http.ResponseWriter, r *http.Request) {
+
 	//io.WriteString(w, "URL: "+r.URL.String())
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
@@ -195,7 +197,7 @@ func main() {
 	// initialise metrics to be returned to 0
 	output.Metrics = make(map[string]float64)
 	for metric, _ := range output.Units {
-		output.Metrics[metric] = 0.0001
+		output.Metrics[metric] = 1
 	}
 
 	// add pressureSetting mettrics, fixed value 1013mb
