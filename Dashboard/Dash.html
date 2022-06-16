@@ -1,7 +1,7 @@
 <html>
   <body>
     <script src="d3.v7.min.js"></script>
-    <script src="g3.js"></script>
+    <script src="g3.min.js"></script>
     <script src="gliders.js"></script>
     <script>
 
@@ -12,7 +12,7 @@ var glider = urlParams.get('Glider')
 
 // set default glider
 if( glider == null){
-    glider=K21;
+    glider="K21";
 }
 var sp;
 if( glider in gliders_speeds){
@@ -356,11 +356,14 @@ var panel = g3.panel()
     selectList.id="Glider";
     selectList.name="Glider";
     selectList.setAttribute("onchange","this.form.submit()");
+    selectList.style.fontSize="2em";
+    selectList.style.fill = "#A8A8A4";
 
     Object.keys(gliders_speeds).forEach(key => {
         var option = document.createElement("option");
         option.value = key;
         option.text = key;
+        option.style.fontSize= "2em";
         if(key == glider){
             option.selected=true;
         }
