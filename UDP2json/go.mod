@@ -1,4 +1,4 @@
-module github.com/cevv-be/k7-joy
+module github.com/cevv-be/udp2json
 
 go 1.17
 
