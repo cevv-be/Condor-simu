@@ -30,6 +30,8 @@ Joystick_ Joystick(JOYSTICK_DEFAULT_REPORT_ID,
 // Tost Hall sensor, digital
 #define  Tost 4
 
+#define DeadZone 15
+
 // This maps pins to buttons.
 byte button2pin[] = { 
     L1pin,
@@ -94,6 +96,9 @@ void setup() {
   ads0.setGain(GAIN_ONE);        // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
   ads1.setGain(GAIN_ONE);        // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
 
+  ads0.setDataRate(RATE_ADS1115_860SPS); // or 860
+  ads1.setDataRate(RATE_ADS1115_860SPS); // or 860
+
 
   if (!ads0.begin( )) {
     Serial.println("Failed to initialize ADS 0.");
@@ -107,7 +112,7 @@ void setup() {
 
 
   Serial.println("Start up Joystick !");
-  Joystick.begin();
+  Joystick.begin(false);
   Serial.println("Joystick Started");
   Joystick.setXAxisRange(0, 30000);
   Joystick.setYAxisRange(0, 30000);
@@ -136,7 +141,9 @@ void loop() {
   int Z;
   int AF;
   int Trim;
-  
+
+  //unsigned long start = millis();
+
     //Serial.println("Main loop !, read buttons");
    // loop on buttons, read pin.
   for (byte index = 0; index < sizeof(button2pin); index = index + 1) {
@@ -166,30 +173,48 @@ void loop() {
   Trim = ads1.readADC_SingleEnded(0);
 
   //Serial.println("Set axis !");
-  if(X != lastX){
+  if(abs(X -lastX) > DeadZone){
     Joystick.setXAxis(X );
+    lastX=X;
     change++;
   }
-  if(Y != lastY){
+  if(abs(Y -lastY) > DeadZone){
     Joystick.setYAxis(Y);
+    lastY=Y;
     change++;
   }
-  if(Z != lastZ){
+  if(abs(Z-lastZ) > DeadZone){
     Joystick.setZAxis(Z);
+    lastZ=Z;
     change++;
   }
-  if(Trim != lastTrim){
+  if(abs(Trim-lastTrim) >DeadZone){
     Joystick.setRyAxis(Trim);
+    lastTrim=Trim;
     change++;
   }
-  if(AF != lastAF){
+  if(abs(AF-lastAF) >  DeadZone){
     Joystick.setBrake(AF);
+    lastAF=AF;
     change++;
   }
 
+  // joystick is only update in cas of change
   //Serial.println("Send State");
   if(change >0){
     Joystick.sendState();
   }
-  delay(5);
+
+  //unsigned long duration=millis() - start;
+
+    
+  //Serial.print(duration); Serial.print(" ms: ");
+  //Serial.print("Changes: "),Serial.print(change);
+  //Serial.print(" X: ");Serial.print(X);
+  //Serial.print(" Y: ");Serial.print(Y);
+  //Serial.print(" Z:  "); Serial.print(Z);
+  //Serial.print(" Tr: ");Serial.print(Trim);
+  //Serial.print(" AF: ");Serial.print(AF);
+  //Serial.println();
+  //delay(5);
 }

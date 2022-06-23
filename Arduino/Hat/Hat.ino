@@ -5,7 +5,7 @@
 
 // 1 hat switch, 1 button
 Joystick_ Joystick(0x04, 
-  JOYSTICK_TYPE_GAMEPAD, 1,
+  JOYSTICK_TYPE_JOYSTICK, 1,
   1,
   false, false, false, false, false, false,
   false, false, false, false, false);
