@@ -9,3 +9,6 @@
 .idea/dbnavigator.xml
 .idea/Condor-simu.iml
 UDP2json/.vscode/launch.json
+UDP2json/udp2json_stdout.log
+.$architecture.drawio.bkp
+.$architecture.drawio.dtmp
