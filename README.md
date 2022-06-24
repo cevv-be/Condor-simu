@@ -18,6 +18,7 @@ Is a biplace simulator based on an old K-7 cockpit.
 <img src="./architecture-Page-1.svg">
 
 The software elements present in this git are:
+
     - The HTML code for the dashboard
     - The Udp2Json glue between *Condor* and the dashboard.
     - Arduino code used for the controlleurs (K7-Joy and the additional controlleur for a POV hat)
@@ -29,7 +30,7 @@ The software elements present in this git are:
 ![DashBoard Capture](./dash.png)
 
 
-Each seat enjoys a 10" LCD screen (1920x1200) as a dynamic dashboard. Both dashboards are mirros of eah other thanks to an HDMI splitter.
+Each seat enjoys a 10" LCD screen (1920x1200) as a dynamic dashboard. Both dashboards are mirrors of eah other thanks to an HDMI splitter.
 
 The dashboard is build using the nice G3 (https://github.com/patricksurry/g3) library. An Html/javascript page is loaded in a browser (*Chrome*) set to fill the dashboard screen.
 The javascript will fetch the metrics repeatidly from the udp2json program.
@@ -50,8 +51,8 @@ To use the buttons from *Condor*:
 The QFE altitude is recorded at the time of the button press. In practice, use the button before the take off run.
 # UDP2json
 
-The udp2json program receives the UDP packet send by Condor to a json served by a build in web server.
-The software also serve the dashboard html and javascripts.
+The udp2json program receives the UDP packet sent by Condor to a json served by a build in web server.
+The software also serves the dashboard html and javascripts.
 It can also relay the UDP packets to another consumer.
 
 Full documentation of the udp2json process is in the udp2json folder.
@@ -64,6 +65,7 @@ Two arduino sketches are used:
 - The Hat use a spare controller to a a POV HAT.
 
 Both sketches use the (https://github.com/MHeironimus/ArduinoJoystickLibrary) library.
+
 # Kicad pcbs:
 
 Arduino based controller with
