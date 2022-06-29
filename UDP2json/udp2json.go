@@ -28,7 +28,7 @@ type httpConfig struct {
 	Port       int    // port to listen on
 	MetricPath string // prefix the json is responding
 	DashPath   string // prefix for the Dashboard files
-	DashDir    string // where the dahboard files are located (Dashboard folder of the git)
+	DashDir    string // where the dashboard files are located (Dashboard folder of the git)
 }
 type udpConfig struct {
 	UdpPort      int    // port to listen to Condor udp messages
