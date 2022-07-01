@@ -9,9 +9,12 @@ The Simulator uses a converted K7 front fuselage as basis.The flight simulator s
 
 Is a biplace simulator based on an old K-7 cockpit.
 
-![frontview]<img src="./front.jpeg">
-![backview]<img src="./back.jpeg">
-![inflight]<img src="./inFlight.jpeg">
+![frontview]
+<img src="./front.jpeg">
+![backview]
+<img src="./back.jpeg">
+![inflight]
+<img src="./inFlight.jpeg">
 # Architecture
 
 ![Architecture Diagram](./architecture-Page-1.drawio.svg)

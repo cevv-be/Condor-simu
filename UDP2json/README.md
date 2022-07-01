@@ -2,7 +2,7 @@
 
 Udp2json is the glue in between the *Condor* flight simulator software (https://www.condorsoaring.com/) and the simulator dashboard implemented as an HTML/javascript page.
 
-udp2json receives the udp packets sent by Condor with metric updates (speed, altitude, ...) and serves them as the json metrics as expected by the g3 library.
+udp2json receives the udp packets sent by Condor with metric updates (speed, altitude, ...) and serves them in the format by the g3 (https://github.com/patricksurry/g3) library.
 
 udp2json is written in the go language and compiled to an executable. Go lang is inherently parallel and allows the UDP reception and the http serving to be independant coroutines.
 
@@ -41,6 +41,11 @@ Udpjson serves the files in the *dashdir* folder under the (http://localhost\:po
 Using an http server avoid CORS filter issues.
 
 The windows firewall may have to be configured to autorise the http server.
+
+```
+netsh advfirewall firewall add rule name="Condor UDP metrics" dir=in action=allow protocol=UDP localport=55278
+netsh advfirewall firewall add rule name="Condor HTTP metrics" dir=in action=allow protocol=TCP localport=8080
+```
 
 ## udp2jsonJson metric serving
 
@@ -84,18 +89,19 @@ This can be reformated for readability as:
 
 ## udp2json.json configuration file
 
-The udp2json*.json* file stores the configuration parameters to udp2 json.
+The udp2json*.json* file stores the configuration parameters to udp2json.
 
 The sections of the file are:
+
 - http http server settings, patch to json and dash pages, location of the dash pages.
     - udp:
-      - liste port
+      - listen port
       - relay addr: an *ip address: port number* pair for a downstream additional condor udp client (i.e. 6DOF platform)
 - metrics unit:
         list of *metric name/metric pair* 
-        Only the metrics with a unit, presnet in the files are served to the dashboard. 
+        Only the metrics with a unit listed in the files are served to the dashboard. 
 
-Available metrics are documented in the "Cockpit Builders" chapter of the condor manual.
+Available metrics are documented in the "Cockpit Builders" chapter of the Condor manual.
 
 ```
 {   
@@ -134,22 +140,22 @@ To compile the udp2json.go to an executable, use the following command in the fo
 
 ## Install as a Windows service
 
-A simple way to set the udp2json as a windows service, start up with the computer is to use the nssm (http://nssm.cc/) software to set up the service.
-As the nssm site is not readilly available, use the chocolatey package nssm to install the software.
+A simple way to set the udp2json as a windows service to start up with the computer is to use the nssm (http://nssm.cc/) software to set up the service.
+As the nssm site is not readilly available, use the chocolatey (https://chocolatey.org/install) package nssm to install the software.
 
 A dump of the configuration is:
 
 ```
-nssm.exe install udp2json %%PATH_TOUDP2JSON_FOLDER\udp2json.exe
+nssm.exe install udp2json %PATH_TOUDP2JSON_FOLDER%\udp2json.exe
 nssm.exe set udp2json AppDirectory %%PATH_TOUDP2JSON_FOLDER
 nssm.exe set udp2json AppExit Default Restart
 nssm.exe set udp2json AppNoConsole 1
-nssm.exe set udp2json AppStdout %%PATH_TOUDP2JSON_FOLDER\udp2json_stdout.log
-nssm.exe set udp2json AppStderr %%PATH_TOUDP2JSON_FOLDER\udp2json_stderr.log
+nssm.exe set udp2json AppStdout %PATH_TOUDP2JSON_FOLDER%\udp2json_stdout.log
+nssm.exe set udp2json AppStderr %PATH_TOUDP2JSON_FOLDER%\udp2json_stderr.log
 nssm.exe set udp2json AppThrottle 3000
 nssm.exe set udp2json AppTimestampLog 1
 nssm.exe set udp2json Description "Receive Condor UDP and supply json"
-nssm.exe set udp2json DisplayName "Condor  UDP relay"
+nssm.exe set udp2json DisplayName "Condor UDP relay"
 nssm.exe set udp2json ObjectName LocalSystem
 nssm.exe set udp2json Start SERVICE_AUTO_START
 nssm.exe set udp2json Type SERVICE_WIN32_OWN_PROCESS
