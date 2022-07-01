@@ -14,7 +14,7 @@
 #define joystickSensitivity 3
 #define joystickZero 3
 
-#define DELAY 50
+finalize nunchuck#define DELAY 100
 
 // 1 hat switch, 1 button
 Joystick_ Joystick(0x04,
@@ -45,15 +45,15 @@ int angle2pin[] = {
 
 // keyPress map joystick positions to key to send
 // could be merged to three dimensional array but no code improvment...
-uint8_t key1Press [3][3] = {
+uint8_t keyPress [3][3] = {
   { KEY_F2,  KEY_F1, KEY_F4 },
   { KEY_F3, 0, KEY_F5 },
-  { KEY_F6,  KEY_LEFT_CTRL , KEY_LEFT_ALT}
+  { KEY_F6,  KEY_F1 , KEY_TAB}
 } ;
-uint8_t key2Press [3][3] = {
+uint8_t modifierPress [3][3] = {
   { 0,  0, 0 },
   { 0, 0, 0 },
-  { 0, KEY_F1 , KEY_TAB}
+  { 0, KEY_LEFT_CTRL , KEY_LEFT_ALT }
 } ;
 
 void setup() {
@@ -95,7 +95,6 @@ void loop() {
   int16_t X,Y;
   int16_t KX,KY;
   int Xindex;Yindex:
-  boolean toRelease;
 
   // Nunchuck processing
   if (nunchuk_read()) {
@@ -104,8 +103,8 @@ void loop() {
     if(nunchuk_buttonZ()){
 
        // possibility to move the pointer using rotation when Z is pressed.
-       //X=nunchuk_roll()*angleSensitivity;
-       //Y=nunchuk_pitch()*angleSensitivity;
+       X=nunchuk_roll()*angleSensitivity;
+       Y=nunchuk_pitch()*angleSensitivity;
        Zero= angleZero;
 
         // Funny mapping of the joystick to function keys
@@ -113,24 +112,27 @@ void loop() {
         KX=map(nunchuk_joystickX(),-127,127,0,2);
         KY=map(nunchuk_joystickY(),-127,127,2,0);
 
+        //Serial.print(KX);
+        //Serial.print(",");Serial.print(KY);
         if( (KX != lastX) || (KY != lastY)){
           lastX=KX;
           lastY=KY;
           // Is there a keypress to send
-          if( key1Press[KY][KX] > 0 ){
-              Keyboard.press(key1Press[KY][KX]);
-              //Serial.print(key1Press[KY][KX]);
-              if(key2Press[KY][KX] > 0 ){
-                   Keyboard.press(key2Press[KY][KX]);
-                   //Serial.print(",");Serial.println(key2Press[KY][KX]);
+          if( keyPress[KY][KX] > 0 ){
+            //Serial.print(" : ");
+              if(modifierPress[KY][KX] > 0 ){
+                   Keyboard.press(modifierPress[KY][KX]);
+                   //Serial.print(modifierPress[KY][KX]);Serial.print(",");
               }
-              toRelease=true;
-              // Release is delayed to the end after the delay to leave the key active for some time.
-              //Serial.println("ReleaseAll");
+              Keyboard.press(keyPress[KY][KX]);
+              //Serial.print(keyPress[KY][KX]);
+              delay(15);
+              Keyboard.releaseAll();
           }
+          //Serial.println();
         }
     } else {
-       // use nunchuck joystick as pointing device
+       // use nunchuck joystick as pointing device (default)
        X=nunchuk_joystickX()/joystickSensitivity;
        Y=-nunchuk_joystickY()/joystickSensitivity;
        Zero= joystickZero;
@@ -207,9 +209,4 @@ void loop() {
   }
   delay(DELAY);
 
-  // release keypress after a delay
-  if(toRelease){
-     Keyboard.releaseAll();
-     toRelease=false;
-  }
 }
