@@ -48,12 +48,12 @@ int angle2pin[] = {
 uint8_t key1Press [3][3] = {
   { KEY_F2,  KEY_F1, KEY_F4 },
   { KEY_F3, 0, KEY_F5 },
-  { KEY_F6,  KEY_LEFT_CTRL , KEY_F7}
+  { KEY_F6,  KEY_LEFT_CTRL , KEY_LEFT_ALT}
 } ;
 uint8_t key2Press [3][3] = {
   { 0,  0, 0 },
   { 0, 0, 0 },
-  { 0, KEY_F1 , 0}
+  { 0, KEY_F1 , KEY_TAB}
 } ;
 
 void setup() {
@@ -104,8 +104,8 @@ void loop() {
     if(nunchuk_buttonZ()){
 
        // possibility to move the pointer using rotation when Z is pressed.
-       X=nunchuk_roll()*angleSensitivity;
-       Y=nunchuk_pitch()*angleSensitivity;
+       //X=nunchuk_roll()*angleSensitivity;
+       //Y=nunchuk_pitch()*angleSensitivity;
        Zero= angleZero;
 
         // Funny mapping of the joystick to function keys
