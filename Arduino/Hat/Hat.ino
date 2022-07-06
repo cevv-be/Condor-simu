@@ -14,7 +14,7 @@
 #define joystickSensitivity 3
 #define joystickZero 3
 
-finalize nunchuck#define DELAY 100
+#define DELAY 100
 
 // 1 hat switch, 1 button
 Joystick_ Joystick(0x04,
@@ -56,6 +56,8 @@ uint8_t modifierPress [3][3] = {
   { 0, KEY_LEFT_CTRL , KEY_LEFT_ALT }
 } ;
 
+boolean nunchuck_present=false;
+
 void setup() {
 
   // Initialize Button Pins
@@ -72,13 +74,15 @@ void setup() {
   Wire.begin();
 
   // initialize nunchuck communication
-  nunchuk_init();
+  nunchuck_present=(nunchuk_init()==0);
 
   // Mouse
   Mouse.begin();
 
   // Keyboard
   Keyboard.begin();
+
+  Serial.println("initialization done");
 }
 
 // Last state of the pins
@@ -97,8 +101,9 @@ void loop() {
   int Xindex;Yindex:
 
   // Nunchuck processing
-  if (nunchuk_read()) {
+  if (nunchuck_present && nunchuk_read()) {
 
+    Serial.println("Nunchuck processing");
     // Z button swtch between joystick or mouse
     if(nunchuk_buttonZ()){
 
@@ -138,10 +143,12 @@ void loop() {
        Zero= joystickZero;
     }
 
+    // move mouse if stick moved 
     if(abs(X) > Zero||abs(Y)>Zero ){
        Mouse.move(X,Y,0);
     }
 
+    // C button press as mouse click
     if(nunchuk_buttonC()){
         if(!Mouse.isPressed(MOUSE_LEFT)){
          Mouse.press(MOUSE_LEFT);
@@ -151,8 +158,9 @@ void loop() {
          Mouse.release(MOUSE_LEFT);
         }
     }
-  }
+  } // nunchuck
 
+  Serial.println("Hat processing");
   // HAT buttons
   // Read pin values, record if there are changes
   for (byte index = 0; index < sizeof(button2pin); index = index + 1) {

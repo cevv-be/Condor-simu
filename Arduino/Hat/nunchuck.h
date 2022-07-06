@@ -71,7 +71,8 @@ static void nunchuk_init_power() {
 /**
  * Initializes the Nunchuk communication by sending a sequence of bytes
  */
-static void nunchuk_init() {
+static byte nunchuk_init() {
+  byte res=false;
 #ifdef NUNCHUK_DISABLE_ENCRYPTION
   I2C_START(NUNCHUK_ADDRESS);
   I2C_WRITE(0xF0);
@@ -81,13 +82,13 @@ static void nunchuk_init() {
   I2C_START(NUNCHUK_ADDRESS);
   I2C_WRITE(0xFB);
   I2C_WRITE(0x00);
-  I2C_STOP();
+  res=I2C_STOP();
   // delay(1);
 #else
   I2C_START(NUNCHUK_ADDRESS);
   I2C_WRITE(0x40);
   I2C_WRITE(0x00);
-  I2C_STOP();
+  res=I2C_STOP();
   // delay(1);
 #endif
 
@@ -111,6 +112,8 @@ static void nunchuk_init() {
 
   delay(100);  // Wait for serial transfer, before loop()ing
 #endif
+
+  return res;
 }
 
 /**
