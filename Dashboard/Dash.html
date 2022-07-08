@@ -6,6 +6,7 @@
     <script>
 
 
+
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString)
 var glider = urlParams.get('Glider')
@@ -40,7 +41,7 @@ var airspeed=g3.gauge()
             g3.axisSector([sp.aj1, sp.aj2]).inset(5).size(7).style('fill: yellow; stroke: yellow'),  // yellow arc
             g3.axisTicks([sp.vne]).size(17).style('stroke-width: 7').class('g3-danger-stroke'),//red mark vne
             g3.axisTicks([sp.voa]).shape('wedge').size(12).width(15).style('fill: yellow; stroke: yellow').inset(-10),//trait jaune
-            g3.axisLabels().step(50).inset(30),
+            g3.axisLabels().step(50).inset(25),
             g3.axisLabels([sp.minspeed]).size((sp.minspeed % 50) ?10:0).inset(25),
             g3.axisLabels([sp.maxspeed]).size((sp.maxspeed % 50) ?10:0).inset(25),
 
@@ -121,7 +122,7 @@ var altimeter=g3.gauge()
 //Mechanical Vario
 var Vv=g3.gauge()
 .metric('vario').unit('m/s')
-        .measure(d3.scaleLinear().domain([-5, 5]).range([90, 90+360]))
+        .measure(d3.scaleLinear().domain([-5, 5]).range([-240, 60]))
         .append(
             g3.gaugeFace(),
             g3.gaugeScrew().shape('phillips').x(-90).y(-90),
@@ -151,7 +152,7 @@ var Vv=g3.gauge()
 // Electronic Vario
 var Vel=g3.gauge()
         .metric('evario').unit('m/s')
-        .measure(d3.scaleLinear().domain([-10, 10]).range([90, 90+360]))
+        .measure(d3.scaleLinear().domain([-5, 5]).range([-240, 60]))
         .append(
             g3.gaugeFace(),
             g3.gaugeScrew().shape('phillips').x(-90).y(-90),
@@ -159,7 +160,8 @@ var Vel=g3.gauge()
             g3.gaugeScrew().shape('phillips').x(90).y(90),
             g3.gaugeScrew().shape('phillips').x(90).y(-90),
             g3.axisTicks().step(1).size(15).style('stroke-width: 2'),
-            g3.axisLabels().step(2).format(v => Math.abs(v)),
+            g3.axisTicks().step(.5).size(5).style('stroke-width: 2'),
+            g3.axisLabels().format(v => Math.abs(v)),
             g3.gaugeLabel("Electro").y(15).size(15),
             g3.gaugeLabel("m/s").y(25).size(15),
             g3.gaugeLabel("+").x(-47).y(-37).size(15).style('text-anchor: start'),
@@ -167,11 +169,11 @@ var Vel=g3.gauge()
             // needle with integrator before to be printed below
             g3.gauge()
                 .metric('integrator').unit('m/s')
-                .measure(d3.scaleLinear().domain([-10, 10]).range([90, 90+360]))
+                .measure(d3.scaleLinear().domain([-5, 5]).range([70, 70+360]))
                 .append(
-                    g3.indicatePointer().shape('rondel').clamp([-10, 10])
+                    g3.indicatePointer().shape('rondel').clamp([-6, 6])
                 ),
-            g3.indicatePointer().shape('sword').clamp([-10, 10]),
+            g3.indicatePointer().shape('sword').clamp([-6, 6]),
 
 
         );
@@ -306,7 +308,7 @@ function resetG(){
 
 var Gmeter = g3.gauge()
         .metric('gforce').unit('g')
-        .measure(d3.scaleLinear().domain([-6,8]).range([-220,80]))
+        .measure(d3.scaleLinear().domain([-6,8]).range([-248,68]))
         .append(
             g3.gaugeScrew().shape('phillips').x(-90).y(-90).r(10,5),
             g3.gaugeScrew().shape('phillips').x(90).y(90).r(10,5),
@@ -373,6 +375,7 @@ var panel = g3.panel()
 
     document.getElementsByTagName("body")[0]
                             .appendChild(form);
+                           
     </script>
   </body>
 
