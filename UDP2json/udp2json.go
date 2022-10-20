@@ -1,8 +1,7 @@
 package main
 
 /*
-Firewall authorisation (windows11):
-netsh advfirewall firewall add rule name="Condor UDP metrics" dir=in action=allow protocol=UDP localport=55278
+
 */
 import (
 	"bytes"

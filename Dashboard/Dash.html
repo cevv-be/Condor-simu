@@ -275,7 +275,7 @@ var compass = g3.gauge()
                     g3.gauge()
                     .r('130')
                     .metric('compass').unit('deg')
-                    .measure(d3.scaleLinear().domain([0,360]).range([0,360]))
+                    .measure(d3.scaleLinear().domain([0,360]).range([360,0]))
                     .autoindicate(true)
                     .append(
                         g3.axisTicks().step(5).size(5),
